@@ -47,5 +47,7 @@
 	</properties>
 	<modules>
 		<module>cheetah-jdbc</module>
+		<module>cheetah-sandbox</module>
+		<module>cheetah-streaming</module>
 	</modules>
 </project>
