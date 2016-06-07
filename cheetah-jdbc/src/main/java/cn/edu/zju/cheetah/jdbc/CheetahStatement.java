@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * @author David
  *
@@ -32,7 +34,7 @@ public class CheetahStatement implements Statement {
 
   @Override
   public ResultSet executeQuery(String sql) throws SQLException {
-    // TODO Auto-generated method stub
+    System.out.println("SQL: " + sql);
     return null;
   }
 
@@ -389,5 +391,12 @@ public class CheetahStatement implements Statement {
     // TODO Auto-generated method stub
     return false;
   }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this).toString();
+  }
+  
+  
 
 }

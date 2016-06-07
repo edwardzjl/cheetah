@@ -3,6 +3,8 @@
  */
 package cn.edu.zju.cheetah.jdbc;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -22,11 +24,22 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * @author David
  *
  */
 public class CheetahConnection implements Connection {
+  
+  private DataSource spec;
+  
+  private Properties prop;
+  
+  public CheetahConnection(DataSource spec, Properties prop) {
+    this.spec = checkNotNull(spec);
+    this.prop = checkNotNull(prop);
+  }
 
   @Override
   public <T> T unwrap(Class<T> iface) throws SQLException {
@@ -40,7 +53,7 @@ public class CheetahConnection implements Connection {
 
   @Override
   public Statement createStatement() throws SQLException {
-    return null;
+    return new CheetahStatement();
   }
 
   @Override
@@ -385,4 +398,12 @@ public class CheetahConnection implements Connection {
     return 0;
   }
 
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("Server", spec.getServer())
+        .add("Port", spec.getPort()).toString();
+  }
+
+  
 }

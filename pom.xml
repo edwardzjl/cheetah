@@ -44,6 +44,8 @@
 		<hadoop.version>2.6.0</hadoop.version>
 		<libthrift.version>0.9.3</libthrift.version>
 		<log4j2.version>2.4.1</log4j2.version>
+		<derby.version>10.10.2.0</derby.version>
+		<guava.version>19.0</guava.version>
 	</properties>
 	<modules>
 		<module>cheetah-jdbc</module>

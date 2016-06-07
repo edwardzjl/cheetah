@@ -3,8 +3,11 @@
  */
 package cn.edu.zju.cheetah.jdbc;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.sql.Connection;
 import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
@@ -16,26 +19,35 @@ import java.util.logging.Logger;
  *
  */
 public class CheetahDriver implements Driver {
-  
-  public static String DriverPrefix = "jdbc:cheetah";
-  
+
   public static String DriverName = "ZJU Cheetah JDBC Driver";
+
+  static {
+    try {
+      DriverManager.registerDriver(new CheetahDriver());
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
 
   @Override
   public Connection connect(String url, Properties info) throws SQLException {
-    return null;
+    return new CheetahConnection(new DataSource(checkNotNull(url)), checkNotNull(info));
   }
 
   @Override
   public boolean acceptsURL(String url) throws SQLException {
-    if(!url.startsWith(DriverPrefix))
+    try {
+      new DataSource(url);
+    } catch (InvalidDataSourceException e) {
       return false;
+    }
     return true;
   }
 
   @Override
   public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) throws SQLException {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
