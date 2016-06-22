@@ -24,8 +24,9 @@ public class ResultSets {
   public static String rowToString(ResultSet rs) throws SQLException {
     checkNotNull(rs);
     StringBuilder rowBuf = new StringBuilder("(");
-    ResultSetMetaData rsmd = rs.getMetaData();
-    int cnt = rsmd.getColumnCount();
+    //ResultSetMetaData rsmd = rs.getMetaData();
+    //int cnt = rsmd.getColumnCount();
+    int cnt = 2;
     for(int i = 1; i <cnt; i++)
       rowBuf.append(rs.getString(i) +", ");
     rowBuf.append(rs.getString(cnt) + ")");

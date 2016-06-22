@@ -3,11 +3,15 @@
  */
 package cn.edu.zju.cheetah.jdbc;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
+
+import com.yahoo.sql4d.sql4ddriver.DDataSource;
 
 /**
  * @author David
@@ -18,15 +22,21 @@ public class CheetahDatabaseMetaData implements DatabaseMetaData {
   public static String DatabaseProductName = "ZJU Cheetah";
   
   public static String DatabaseProductVersion = "0.0.0.1 - alpha";
+  
+  private DDataSource druidDriver;
+  
+  public CheetahDatabaseMetaData(DDataSource druidDriver) {
+    this.druidDriver = checkNotNull(druidDriver);
+  }
 
   @Override
   public <T> T unwrap(Class<T> iface) throws SQLException {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public boolean isWrapperFor(Class<?> iface) throws SQLException {
-    return iface.isAssignableFrom(CheetahDatabaseMetaData.class);
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -1055,13 +1065,10 @@ public class CheetahDatabaseMetaData implements DatabaseMetaData {
     return null;
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.DatabaseMetaData#getTables(java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
-   */
   @Override
   public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern,
       String[] types) throws SQLException {
-    // TODO Auto-generated method stub
+    druidDriver.dataSources(null);
     return null;
   }
 
@@ -1092,13 +1099,10 @@ public class CheetahDatabaseMetaData implements DatabaseMetaData {
     return null;
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.DatabaseMetaData#getColumns(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-   */
   @Override
   public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern,
       String columnNamePattern) throws SQLException {
-    // TODO Auto-generated method stub
+    druidDriver.aboutDataSource(tableNamePattern, null);
     return null;
   }
 

@@ -3,6 +3,8 @@
  */
 package cn.edu.zju.cheetah.jdbc;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -23,6 +25,7 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -32,56 +35,50 @@ import java.util.Map;
  *
  */
 public class CheetahResultSet implements ResultSet {
+  
+  private TableSchema schema;
+  
+  private Iterator<Tuple> iter;
+  
+  private Tuple curTuple;
+  
+  public CheetahResultSet(InMemTable memTable) {
+    memTable = checkNotNull(memTable);
+    this.schema = memTable.getSchema();
+    this.iter = memTable.iterator();
+  }
 
   @Override
   public <T> T unwrap(Class<T> iface) throws SQLException {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException();
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.Wrapper#isWrapperFor(java.lang.Class)
-   */
   @Override
   public boolean isWrapperFor(Class<?> iface) throws SQLException {
-    // TODO Auto-generated method stub
-    return false;
+    throw new UnsupportedOperationException();
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.ResultSet#next()
-   */
   @Override
   public boolean next() throws SQLException {
-    // TODO Auto-generated method stub
+    if(iter.hasNext()){
+      curTuple = iter.next();
+      return true;
+    }
     return false;
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.ResultSet#close()
-   */
   @Override
   public void close() throws SQLException {
-    // TODO Auto-generated method stub
-
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.ResultSet#wasNull()
-   */
   @Override
   public boolean wasNull() throws SQLException {
-    // TODO Auto-generated method stub
     return false;
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.ResultSet#getString(int)
-   */
   @Override
   public String getString(int columnIndex) throws SQLException {
-    // TODO Auto-generated method stub
-    return null;
+    return (String) curTuple.getField(columnIndex - 1);
   }
 
   /* (non-Javadoc)
@@ -219,13 +216,9 @@ public class CheetahResultSet implements ResultSet {
     return null;
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.ResultSet#getString(java.lang.String)
-   */
   @Override
   public String getString(String columnLabel) throws SQLException {
-    // TODO Auto-generated method stub
-    return null;
+    return getString(findColumn(columnLabel) + 1);
   }
 
   /* (non-Javadoc)
@@ -417,13 +410,12 @@ public class CheetahResultSet implements ResultSet {
     return null;
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.ResultSet#findColumn(java.lang.String)
-   */
   @Override
   public int findColumn(String columnLabel) throws SQLException {
-    // TODO Auto-generated method stub
-    return 0;
+    int columnIndex = schema.findColumn(columnLabel);
+    if(columnIndex < 0)
+      throw new SQLException("Invalid column label: " + columnLabel);
+    return columnIndex;
   }
 
   /* (non-Javadoc)
@@ -516,22 +508,14 @@ public class CheetahResultSet implements ResultSet {
 
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.ResultSet#first()
-   */
   @Override
   public boolean first() throws SQLException {
-    // TODO Auto-generated method stub
-    return false;
+    throw new UnsupportedOperationException();
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.ResultSet#last()
-   */
   @Override
   public boolean last() throws SQLException {
-    // TODO Auto-generated method stub
-    return false;
+    throw new UnsupportedOperationException();
   }
 
   /* (non-Javadoc)

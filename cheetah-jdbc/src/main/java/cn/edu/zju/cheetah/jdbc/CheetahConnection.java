@@ -25,30 +25,36 @@ import java.util.Properties;
 import java.util.concurrent.Executor;
 
 import com.google.common.base.MoreObjects;
+import com.yahoo.sql4d.sql4ddriver.DDataSource;
 
 /**
+ * The JDBC connection implementation for a Druid database.
  * @author David
  *
  */
 public class CheetahConnection implements Connection {
   
-  private DataSource spec;
+  private DataSource dataSource;
   
   private Properties prop;
   
-  public CheetahConnection(DataSource spec, Properties prop) {
-    this.spec = checkNotNull(spec);
+  private DDataSource druidDriver;
+  
+  public CheetahConnection(DataSource dataSource, Properties prop) {
+    this.dataSource = checkNotNull(dataSource);
     this.prop = checkNotNull(prop);
+    //TODO: Add support for configuration for coordinator node/port, mysql node/port
+    this.druidDriver = new DDataSource(dataSource.getServer(), dataSource.getPort());
   }
 
   @Override
   public <T> T unwrap(Class<T> iface) throws SQLException {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public boolean isWrapperFor(Class<?> iface) throws SQLException {
-    return false;
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -103,7 +109,7 @@ public class CheetahConnection implements Connection {
 
   @Override
   public DatabaseMetaData getMetaData() throws SQLException {
-    return null;
+    return new CheetahDatabaseMetaData(null);
   }
 
   @Override
@@ -401,8 +407,8 @@ public class CheetahConnection implements Connection {
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
-        .add("Server", spec.getServer())
-        .add("Port", spec.getPort()).toString();
+        .add("Server", dataSource.getServer())
+        .add("Port", dataSource.getPort()).toString();
   }
 
   

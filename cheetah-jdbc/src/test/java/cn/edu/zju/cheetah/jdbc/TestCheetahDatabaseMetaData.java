@@ -14,7 +14,7 @@ import junit.framework.TestCase;
 public class TestCheetahDatabaseMetaData extends TestCase {
   
   public void testIsWrapperFor() throws Exception {
-    DatabaseMetaData dmd = new CheetahDatabaseMetaData();
+    DatabaseMetaData dmd = new CheetahDatabaseMetaData(null);
     assertTrue(dmd.isWrapperFor(DatabaseMetaData.class));
   }
 }
