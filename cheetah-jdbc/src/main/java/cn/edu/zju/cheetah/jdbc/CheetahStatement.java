@@ -3,6 +3,8 @@
  */
 package cn.edu.zju.cheetah.jdbc;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,31 +12,35 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 
 import com.google.common.base.MoreObjects;
+import com.yahoo.sql4d.sql4ddriver.DDataSource;
 
 /**
  * @author David
  *
  */
 public class CheetahStatement implements Statement {
+  
+  private DDataSource druidDriver;
+  
+  public CheetahStatement(DDataSource druidDriver) {
+    this.druidDriver = checkNotNull(druidDriver);
+  }
 
   @Override
   public <T> T unwrap(Class<T> iface) throws SQLException {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException();
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.Wrapper#isWrapperFor(java.lang.Class)
-   */
   @Override
   public boolean isWrapperFor(Class<?> iface) throws SQLException {
-    // TODO Auto-generated method stub
-    return false;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public ResultSet executeQuery(String sql) throws SQLException {
     System.out.println("SQL: " + sql);
+    //TODO: put the following results into a CheeahResultSet
+    druidDriver.query(sql, null);
     return null;
   }
 
@@ -397,6 +403,4 @@ public class CheetahStatement implements Statement {
     return MoreObjects.toStringHelper(this).toString();
   }
   
-  
-
 }

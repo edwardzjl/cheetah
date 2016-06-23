@@ -34,17 +34,32 @@ import com.yahoo.sql4d.sql4ddriver.DDataSource;
  */
 public class CheetahConnection implements Connection {
   
-  private DataSource dataSource;
+  private DriverURL driverUrl;
   
   private Properties prop;
   
   private DDataSource druidDriver;
   
-  public CheetahConnection(DataSource dataSource, Properties prop) {
-    this.dataSource = checkNotNull(dataSource);
-    this.prop = checkNotNull(prop);
-    //TODO: Add support for configuration for coordinator node/port, mysql node/port
-    this.druidDriver = new DDataSource(dataSource.getServer(), dataSource.getPort());
+  public CheetahConnection(DriverURL driverUrl, Properties info) {
+    this.driverUrl = checkNotNull(driverUrl);
+    this.prop = checkNotNull(info);
+    String cHost = info.getProperty(CheetahCluster.COORDINATOR_HOST);
+    String value = info.getProperty(CheetahCluster.COORDINATOR_PORT);
+    if(cHost == null || value == null)
+      throw new IllegalArgumentException("No coordinator!");
+    int cPort = Integer.parseInt(value);
+    String bHost = info.getProperty(CheetahCluster.BROKER_HOST);
+    value = info.getProperty(CheetahCluster.BROKER_PORT);
+    if(bHost == null || value == null)
+      throw new IllegalArgumentException("No broker!");
+    int bPort = Integer.parseInt(value);
+    
+    String oHost = info.getProperty(CheetahCluster.OVERLOAD_HOST);
+    value = info.getProperty(CheetahCluster.OVERLOAD_PORT);
+    int oPort = Integer.parseInt(value);
+    
+    System.out.printf("%s:%d %s:%d %s:%d\n", bHost, bPort, cHost, cPort, oHost, oPort);
+    druidDriver = new DDataSource(bHost, bPort, cHost, cPort, oHost, oPort);
   }
 
   @Override
@@ -59,7 +74,7 @@ public class CheetahConnection implements Connection {
 
   @Override
   public Statement createStatement() throws SQLException {
-    return new CheetahStatement();
+    return new CheetahStatement(druidDriver);
   }
 
   @Override
@@ -109,7 +124,7 @@ public class CheetahConnection implements Connection {
 
   @Override
   public DatabaseMetaData getMetaData() throws SQLException {
-    return new CheetahDatabaseMetaData(null);
+    return new CheetahDatabaseMetaData(druidDriver);
   }
 
   @Override
@@ -126,13 +141,9 @@ public class CheetahConnection implements Connection {
   public void setCatalog(String catalog) throws SQLException {
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.Connection#getCatalog()
-   */
   @Override
   public String getCatalog() throws SQLException {
-    // TODO Auto-generated method stub
-    return null;
+    return driverUrl.getDatabase();
   }
 
   @Override
@@ -407,8 +418,8 @@ public class CheetahConnection implements Connection {
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
-        .add("Server", dataSource.getServer())
-        .add("Port", dataSource.getPort()).toString();
+        .add("CheetahCluster", prop)
+        .add("Database", driverUrl.getDatabase()).toString();
   }
 
   

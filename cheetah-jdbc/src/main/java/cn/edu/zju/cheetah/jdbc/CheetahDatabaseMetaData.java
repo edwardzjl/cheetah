@@ -10,8 +10,11 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
+import java.util.List;
 
 import com.yahoo.sql4d.sql4ddriver.DDataSource;
+
+import scala.util.Either;
 
 /**
  * @author David
@@ -51,13 +54,11 @@ public class CheetahDatabaseMetaData implements DatabaseMetaData {
 
   @Override
   public String getURL() throws SQLException {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public String getUserName() throws SQLException {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -103,12 +104,8 @@ public class CheetahDatabaseMetaData implements DatabaseMetaData {
     return CheetahDriver.DriverName;
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.DatabaseMetaData#getDriverVersion()
-   */
   @Override
   public String getDriverVersion() throws SQLException {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -1068,22 +1065,27 @@ public class CheetahDatabaseMetaData implements DatabaseMetaData {
   @Override
   public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern,
       String[] types) throws SQLException {
-    druidDriver.dataSources(null);
-    return null;
+    //TODO: test the following code
+    Either<String, List<String>> tables = druidDriver.dataSources(null);
+    if(tables.isLeft())
+      throw new SQLException(tables.left().get());
+    
+    List<String> druidTables = tables.right().get();
+    TableSchema schema = new TableSchema();
+    schema.addColumn(new ColumnSchema("table_name", java.sql.Types.VARCHAR));
+    InMemTable memTable = new InMemTable(schema);
+    for(String druidTable : druidTables) {
+      memTable.append(Tuple.of(druidTable));
+    }
+    return new CheetahResultSet(memTable);
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.DatabaseMetaData#getSchemas()
-   */
   @Override
   public ResultSet getSchemas() throws SQLException {
     // TODO Auto-generated method stub
     return null;
   }
 
-  /* (non-Javadoc)
-   * @see java.sql.DatabaseMetaData#getCatalogs()
-   */
   @Override
   public ResultSet getCatalogs() throws SQLException {
     // TODO Auto-generated method stub
@@ -1102,7 +1104,7 @@ public class CheetahDatabaseMetaData implements DatabaseMetaData {
   @Override
   public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern,
       String columnNamePattern) throws SQLException {
-    druidDriver.aboutDataSource(tableNamePattern, null);
+    //TODO: call druidDriver.aboutDataSource(tableNamePattern, null);
     return null;
   }
 

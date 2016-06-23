@@ -32,14 +32,14 @@ public class CheetahDriver implements Driver {
 
   @Override
   public Connection connect(String url, Properties info) throws SQLException {
-    return new CheetahConnection(new DataSource(checkNotNull(url)), checkNotNull(info));
+    return new CheetahConnection(new DriverURL(checkNotNull(url)), checkNotNull(info));
   }
 
   @Override
   public boolean acceptsURL(String url) throws SQLException {
     try {
-      new DataSource(url);
-    } catch (InvalidDataSourceException e) {
+      new DriverURL(url);
+    } catch (InvalidDriverURLException e) {
       return false;
     }
     return true;
