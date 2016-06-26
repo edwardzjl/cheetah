@@ -26,8 +26,8 @@ public class TestJDBC extends TestCase {
     cheetah.setProperty(CheetahCluster.BROKER_PORT, "8023");
     cheetah.setProperty(CheetahCluster.COORDINATOR_HOST, "localhost");
     cheetah.setProperty(CheetahCluster.COORDINATOR_PORT, "9078");
-    cheetah.setProperty(CheetahCluster.OVERLOAD_HOST, "localhost");
-    cheetah.setProperty(CheetahCluster.OVERLOAD_PORT, "7856");
+    cheetah.setProperty(CheetahCluster.OVERLORD_HOST, "localhost");
+    cheetah.setProperty(CheetahCluster.OVERLORD_HOST, "7856");
     
     Connection dbConn = DriverManager.getConnection(dbUrl, cheetah);
 //    DatabaseMetaData dbmd = dbConn.getMetaData();

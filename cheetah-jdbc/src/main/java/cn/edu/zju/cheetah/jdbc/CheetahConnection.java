@@ -54,8 +54,8 @@ public class CheetahConnection implements Connection {
       throw new IllegalArgumentException("No broker!");
     int bPort = Integer.parseInt(value);
     
-    String oHost = info.getProperty(CheetahCluster.OVERLOAD_HOST);
-    value = info.getProperty(CheetahCluster.OVERLOAD_PORT);
+    String oHost = info.getProperty(CheetahCluster.OVERLORD_HOST);
+    value = info.getProperty(CheetahCluster.OVERLORD_PORT);
     int oPort = Integer.parseInt(value);
     
     System.out.printf("%s:%d %s:%d %s:%d\n", bHost, bPort, cHost, cPort, oHost, oPort);

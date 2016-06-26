@@ -17,8 +17,8 @@ public class CheetahCluster {
   
   public static String COORDINATOR_PORT = "coordinator.port";
   
-  public static String OVERLOAD_HOST = "overload.host";
+  public static String OVERLORD_HOST = "overlord.host";
   
-  public static String OVERLOAD_PORT = "overload.port";
+  public static String OVERLORD_PORT = "overlord.port";
   
 }
