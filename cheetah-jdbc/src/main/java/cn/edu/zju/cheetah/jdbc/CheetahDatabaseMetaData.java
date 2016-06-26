@@ -14,6 +14,7 @@ import java.util.List;
 
 import com.yahoo.sql4d.sql4ddriver.DDataSource;
 
+import scala.Tuple2;
 import scala.util.Either;
 
 /**
@@ -1104,8 +1105,20 @@ public class CheetahDatabaseMetaData implements DatabaseMetaData {
   @Override
   public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern,
       String columnNamePattern) throws SQLException {
-    //TODO: call druidDriver.aboutDataSource(tableNamePattern, null);
-    return null;
+    Either<String, Tuple2<List<String>, List<String>>> dataSourceDescRes =
+        druidDriver.aboutDataSource(tableNamePattern, null);
+    if (dataSourceDescRes.isLeft())
+      throw new SQLException(dataSourceDescRes.left().get());
+
+    List<String> dims = dataSourceDescRes.right().get()._1();
+    TableSchema schema = new TableSchema();
+    schema.addColumn(new ColumnSchema("TABLE_NAME", java.sql.Types.VARCHAR));
+    schema.addColumn(new ColumnSchema("COLUMN_NAME", java.sql.Types.VARCHAR));
+    InMemTable memTable = new InMemTable(schema);
+    for (String dim : dims) {
+      memTable.append(Tuple.of(tableNamePattern, dim));
+    }
+    return new CheetahResultSet(memTable);
   }
 
   /* (non-Javadoc)

@@ -10,9 +10,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.util.List;
 
 import com.google.common.base.MoreObjects;
 import com.yahoo.sql4d.sql4ddriver.DDataSource;
+import com.yahoo.sql4d.sql4ddriver.Joiner4All;
+import com.yahoo.sql4d.sql4ddriver.Mapper4All;
+
+import scala.util.Either;
 
 /**
  * @author David
@@ -38,10 +43,33 @@ public class CheetahStatement implements Statement {
 
   @Override
   public ResultSet executeQuery(String sql) throws SQLException {
-    System.out.println("SQL: " + sql);
-    //TODO: put the following results into a CheeahResultSet
-    druidDriver.query(sql, null);
-    return null;
+    //TODO: test the following code
+    Either<String, Either<Joiner4All, Mapper4All>> result = druidDriver.query(sql, null);
+    if (result.isLeft())
+      throw new SQLException(result.left().get());
+
+    Either<Joiner4All, Mapper4All> goodResult = result.right().get();
+
+    List<String> fields;
+    List<List<Object>> rows;
+    if (goodResult.isLeft()) {
+      fields = goodResult.left().get().baseFieldNames;
+      rows = (List<List<Object>>) goodResult.left().get().baseAllRows.values();
+    } else {
+      fields = goodResult.right().get().baseFieldNames;
+      rows = goodResult.right().get().baseAllRows;
+    }
+
+    TableSchema schema = new TableSchema();
+    for (String field : fields) {
+      // TODO: retrieve type of each field and map it to SQL type
+      schema.addColumn(new ColumnSchema(field, java.sql.Types.VARCHAR));
+    }
+    InMemTable memTable = new InMemTable(schema);
+    for (List<Object> row : rows) {
+      memTable.append(Tuple.of(row.toArray()));
+    }
+    return new CheetahResultSet(memTable);
   }
 
   @Override
