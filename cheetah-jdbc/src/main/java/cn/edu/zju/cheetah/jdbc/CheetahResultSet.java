@@ -36,6 +36,8 @@ import java.util.Map;
  */
 public class CheetahResultSet implements ResultSet {
   
+  private InMemTable memTable;
+  
   private TableSchema schema;
   
   private Iterator<Tuple> iter;
@@ -43,7 +45,7 @@ public class CheetahResultSet implements ResultSet {
   private Tuple curTuple;
   
   public CheetahResultSet(InMemTable memTable) {
-    memTable = checkNotNull(memTable);
+    this.memTable = checkNotNull(memTable);
     this.schema = memTable.getSchema();
     this.iter = memTable.iterator();
   }
@@ -78,7 +80,11 @@ public class CheetahResultSet implements ResultSet {
 
   @Override
   public String getString(int columnIndex) throws SQLException {
-    return (String) curTuple.getField(columnIndex - 1);
+    Object obj = getObject(columnIndex);
+    if (obj instanceof String) {
+      return (String) obj;
+    }
+    return getObject(columnIndex).toString();
   }
 
   /* (non-Javadoc)
@@ -86,8 +92,15 @@ public class CheetahResultSet implements ResultSet {
    */
   @Override
   public boolean getBoolean(int columnIndex) throws SQLException {
-    // TODO Auto-generated method stub
-    return false;
+    Object obj = getObject(columnIndex);
+    if (obj instanceof Boolean) {
+      return (Boolean) obj;
+    }
+    try {
+      return Boolean.valueOf(getString(columnIndex));
+    } catch (IllegalArgumentException e) {
+      throw new SQLException(e.getMessage());
+    }
   }
 
   /* (non-Javadoc)
@@ -104,8 +117,15 @@ public class CheetahResultSet implements ResultSet {
    */
   @Override
   public short getShort(int columnIndex) throws SQLException {
-    // TODO Auto-generated method stub
-    return 0;
+    Object obj = getObject(columnIndex);
+    if (obj instanceof Short) {
+      return (Short) obj;
+    }
+    try {
+      return Short.valueOf(getString(columnIndex));
+    } catch (IllegalArgumentException e) {
+      throw new SQLException(e.getMessage());
+    }
   }
 
   /* (non-Javadoc)
@@ -113,8 +133,15 @@ public class CheetahResultSet implements ResultSet {
    */
   @Override
   public int getInt(int columnIndex) throws SQLException {
-    // TODO Auto-generated method stub
-    return 0;
+    Object obj = getObject(columnIndex);
+    if (obj instanceof Integer) {
+      return (Integer) obj;
+    }
+    try {
+      return Integer.valueOf(getString(columnIndex));
+    } catch (IllegalArgumentException e) {
+      throw new SQLException(e.getMessage());
+    }
   }
 
   /* (non-Javadoc)
@@ -122,8 +149,15 @@ public class CheetahResultSet implements ResultSet {
    */
   @Override
   public long getLong(int columnIndex) throws SQLException {
-    // TODO Auto-generated method stub
-    return 0;
+    Object obj = getObject(columnIndex);
+    if (obj instanceof Long) {
+      return (Long) obj;
+    }
+    try {
+      return Long.valueOf(getString(columnIndex));
+    } catch (IllegalArgumentException e) {
+      throw new SQLException(e.getMessage());
+    }
   }
 
   /* (non-Javadoc)
@@ -131,8 +165,15 @@ public class CheetahResultSet implements ResultSet {
    */
   @Override
   public float getFloat(int columnIndex) throws SQLException {
-    // TODO Auto-generated method stub
-    return 0;
+    Object obj = getObject(columnIndex);
+    if (obj instanceof Float) {
+      return (Float) obj;
+    }
+    try {
+      return Float.valueOf(getString(columnIndex));
+    } catch (IllegalArgumentException e) {
+      throw new SQLException(e.getMessage());
+    }
   }
 
   /* (non-Javadoc)
@@ -140,8 +181,15 @@ public class CheetahResultSet implements ResultSet {
    */
   @Override
   public double getDouble(int columnIndex) throws SQLException {
-    // TODO Auto-generated method stub
-    return 0;
+    Object obj = getObject(columnIndex);
+    if (obj instanceof Double) {
+      return (Double) obj;
+    }
+    try {
+      return Double.valueOf(getString(columnIndex));
+    } catch (IllegalArgumentException e) {
+      throw new SQLException(e.getMessage());
+    }
   }
 
   /* (non-Javadoc)
@@ -226,8 +274,7 @@ public class CheetahResultSet implements ResultSet {
    */
   @Override
   public boolean getBoolean(String columnLabel) throws SQLException {
-    // TODO Auto-generated method stub
-    return false;
+    return getBoolean(findColumn(columnLabel) + 1);
   }
 
   /* (non-Javadoc)
@@ -244,8 +291,7 @@ public class CheetahResultSet implements ResultSet {
    */
   @Override
   public short getShort(String columnLabel) throws SQLException {
-    // TODO Auto-generated method stub
-    return 0;
+    return getShort(findColumn(columnLabel) + 1);
   }
 
   /* (non-Javadoc)
@@ -253,8 +299,7 @@ public class CheetahResultSet implements ResultSet {
    */
   @Override
   public int getInt(String columnLabel) throws SQLException {
-    // TODO Auto-generated method stub
-    return 0;
+    return getInt(findColumn(columnLabel) + 1);
   }
 
   /* (non-Javadoc)
@@ -262,8 +307,7 @@ public class CheetahResultSet implements ResultSet {
    */
   @Override
   public long getLong(String columnLabel) throws SQLException {
-    // TODO Auto-generated method stub
-    return 0;
+    return getLong(findColumn(columnLabel) + 1);
   }
 
   /* (non-Javadoc)
@@ -271,8 +315,7 @@ public class CheetahResultSet implements ResultSet {
    */
   @Override
   public float getFloat(String columnLabel) throws SQLException {
-    // TODO Auto-generated method stub
-    return 0;
+    return getFloat(findColumn(columnLabel) + 1);
   }
 
   /* (non-Javadoc)
@@ -280,8 +323,7 @@ public class CheetahResultSet implements ResultSet {
    */
   @Override
   public double getDouble(String columnLabel) throws SQLException {
-    // TODO Auto-generated method stub
-    return 0;
+    return getDouble(findColumn(columnLabel) + 1);
   }
 
   /* (non-Javadoc)
@@ -397,8 +439,7 @@ public class CheetahResultSet implements ResultSet {
    */
   @Override
   public Object getObject(int columnIndex) throws SQLException {
-    // TODO Auto-generated method stub
-    return null;
+    return curTuple.getField(columnIndex - 1);
   }
 
   /* (non-Javadoc)
@@ -523,8 +564,7 @@ public class CheetahResultSet implements ResultSet {
    */
   @Override
   public int getRow() throws SQLException {
-    // TODO Auto-generated method stub
-    return 0;
+    return memTable.getRow();
   }
 
   /* (non-Javadoc)

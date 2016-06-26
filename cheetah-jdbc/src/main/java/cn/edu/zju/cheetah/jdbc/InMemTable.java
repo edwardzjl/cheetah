@@ -42,6 +42,10 @@ public class InMemTable implements Iterable<Tuple> {
   public void append(Collection<? extends Tuple> tuples) {
     storage.addAll(tuples);
   }
+  
+  public int getRow() {
+    return storage.size();
+  }
 
   @Override
   public Iterator<Tuple> iterator() {
