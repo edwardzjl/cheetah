@@ -5,6 +5,11 @@ package cn.edu.zju.cheetah.jdbc;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.MoreObjects;
+
+import com.yahoo.sql4d.sql4ddriver.BrokerAccessor;
+import com.yahoo.sql4d.sql4ddriver.DDataSource;
+
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -24,30 +29,32 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
-import com.google.common.base.MoreObjects;
-import com.yahoo.sql4d.sql4ddriver.DDataSource;
-
 /**
  * The JDBC connection implementation for a Druid database.
  * @author David
  *
  */
 public class CheetahConnection implements Connection {
-  
+
   private DriverURL driverUrl;
   
   private Properties prop;
   
   private DDataSource druidDriver;
-  
+  private BrokerAccessor druidBroker;
+
+  private static int MAX_BROKER_CONNS = 100;
+
   public CheetahConnection(DriverURL driverUrl, Properties info) {
     this.driverUrl = checkNotNull(driverUrl);
     this.prop = checkNotNull(info);
+    
     String cHost = info.getProperty(CheetahCluster.COORDINATOR_HOST);
     String value = info.getProperty(CheetahCluster.COORDINATOR_PORT);
     if(cHost == null || value == null)
       throw new IllegalArgumentException("No coordinator!");
     int cPort = Integer.parseInt(value);
+    
     String bHost = info.getProperty(CheetahCluster.BROKER_HOST);
     value = info.getProperty(CheetahCluster.BROKER_PORT);
     if(bHost == null || value == null)
@@ -60,6 +67,7 @@ public class CheetahConnection implements Connection {
     
     System.out.printf("%s:%d %s:%d %s:%d\n", bHost, bPort, cHost, cPort, oHost, oPort);
     druidDriver = new DDataSource(bHost, bPort, cHost, cPort, oHost, oPort);
+    druidBroker = new BrokerAccessor(bHost, bPort, MAX_BROKER_CONNS);
   }
 
   @Override
@@ -124,7 +132,7 @@ public class CheetahConnection implements Connection {
 
   @Override
   public DatabaseMetaData getMetaData() throws SQLException {
-    return new CheetahDatabaseMetaData(druidDriver);
+    return new CheetahDatabaseMetaData(druidDriver,  druidBroker);
   }
 
   @Override

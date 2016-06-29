@@ -38,6 +38,7 @@ public class TestJDBC extends TestCase {
     System.out.println(dbConn.getCatalog());
 
     DatabaseMetaData dbmd = dbConn.getMetaData();
+
     ResultSet rs;
     rs = dbmd.getTables(null, null, null, null);
     System.out.println("Tables: ");
@@ -45,10 +46,14 @@ public class TestJDBC extends TestCase {
       System.out.println(rs.getString(1));
     }
     rs.close();
+
     rs = dbmd.getColumns(null, null, tableName, null);
     System.out.println("Columns of table [" + tableName + "]: ");
     while (rs.next()) {
-      System.out.println(rs.getString(2));
+      for (int i = 1; i <= 4; i++) {
+        System.out.print(rs.getString(i) + " | ");
+      }
+      System.out.println();
     }
     rs.close();
 

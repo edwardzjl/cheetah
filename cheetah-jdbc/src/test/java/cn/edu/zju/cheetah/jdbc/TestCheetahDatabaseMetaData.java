@@ -3,9 +3,9 @@
  */
 package cn.edu.zju.cheetah.jdbc;
 
-import java.sql.DatabaseMetaData;
-
 import junit.framework.TestCase;
+
+import java.sql.DatabaseMetaData;
 
 /**
  * @author David
@@ -14,7 +14,8 @@ import junit.framework.TestCase;
 public class TestCheetahDatabaseMetaData extends TestCase {
   
   public void testIsWrapperFor() throws Exception {
-    DatabaseMetaData dmd = new CheetahDatabaseMetaData(null);
+    DatabaseMetaData dmd = new CheetahDatabaseMetaData(null, null);
     assertTrue(dmd.isWrapperFor(DatabaseMetaData.class));
   }
+
 }
