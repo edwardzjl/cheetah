@@ -34,6 +34,9 @@ public class TestJDBC extends TestCase {
     cheetah.setProperty(CheetahCluster.OVERLORD_PORT, "8090");
 
     Connection dbConn = DriverManager.getConnection(dbUrl, cheetah);
+    String host = "10.214.208.59";
+    String url = DriverURL.getDriverURL(host, 8082, host, 8081, host, 8090);
+    dbConn = DriverManager.getConnection(url, null, null);
     System.out.println(dbConn);
     System.out.println(dbConn.getCatalog());
 

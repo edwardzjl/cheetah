@@ -48,22 +48,21 @@ public class CheetahConnection implements Connection {
   public CheetahConnection(DriverURL driverUrl, Properties info) {
     this.driverUrl = checkNotNull(driverUrl);
     this.prop = checkNotNull(info);
-    
+
     String cHost = info.getProperty(CheetahCluster.COORDINATOR_HOST);
+    cHost = cHost == null ? driverUrl.getCoordinatorHost() : cHost;
     String value = info.getProperty(CheetahCluster.COORDINATOR_PORT);
-    if(cHost == null || value == null)
-      throw new IllegalArgumentException("No coordinator!");
-    int cPort = Integer.parseInt(value);
+    int cPort = value == null ? driverUrl.getCoordinatorPort() : Integer.parseInt(value);
     
     String bHost = info.getProperty(CheetahCluster.BROKER_HOST);
+    bHost = bHost == null ? driverUrl.getBrokerHost() : bHost;
     value = info.getProperty(CheetahCluster.BROKER_PORT);
-    if(bHost == null || value == null)
-      throw new IllegalArgumentException("No broker!");
-    int bPort = Integer.parseInt(value);
+    int bPort = value == null ? driverUrl.getBrokerPort() : Integer.parseInt(value);
     
     String oHost = info.getProperty(CheetahCluster.OVERLORD_HOST);
+    oHost = oHost == null ? driverUrl.getOverloadHost() : oHost;
     value = info.getProperty(CheetahCluster.OVERLORD_PORT);
-    int oPort = Integer.parseInt(value);
+    int oPort = value == null ? driverUrl.getOverloadPort() : Integer.parseInt(value);
     
     System.out.printf("%s:%d %s:%d %s:%d\n", bHost, bPort, cHost, cPort, oHost, oPort);
     druidDriver = new DDataSource(bHost, bPort, cHost, cPort, oHost, oPort);
