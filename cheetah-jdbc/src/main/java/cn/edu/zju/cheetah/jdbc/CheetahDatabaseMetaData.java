@@ -5,6 +5,12 @@ package cn.edu.zju.cheetah.jdbc;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.yahoo.sql4d.sql4ddriver.BrokerAccessor;
+import com.yahoo.sql4d.sql4ddriver.DDataSource;
+import com.yahoo.sql4d.sql4ddriver.Mapper4All;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -13,14 +19,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import com.yahoo.sql4d.sql4ddriver.BrokerAccessor;
-import com.yahoo.sql4d.sql4ddriver.DDataSource;
-import com.yahoo.sql4d.sql4ddriver.Mapper4All;
-
 import scala.Tuple2;
 import scala.util.Either;
 
@@ -35,9 +33,11 @@ public class CheetahDatabaseMetaData implements DatabaseMetaData {
   public static String DatabaseProductVersion = "0.0.0.1 - alpha";
   
   private DDataSource druidDriver;
+  private BrokerAccessor druidBroker;
   
-  public CheetahDatabaseMetaData(DDataSource druidDriver) {
+  public CheetahDatabaseMetaData(DDataSource druidDriver, BrokerAccessor druidBroker) {
     this.druidDriver = checkNotNull(druidDriver);
+    this.druidBroker = checkNotNull(druidBroker);
   }
 
   @Override
@@ -1110,9 +1110,9 @@ public class CheetahDatabaseMetaData implements DatabaseMetaData {
   }
   
   private Map<String, String> retrieveColumnType(String tableName, List<String> columns) {
-    BrokerAccessor accessor = new BrokerAccessor("10.214.208.59", 8082, 10000);
     String json = "{\"queryType\":\"segmentMetadata\",\"dataSource\":\""+ tableName +"\"}";
-    Either<String, Either<Mapper4All, JSONArray>> queryResult = accessor.fireQuery(json, null, false);
+    Either<String, Either<Mapper4All, JSONArray>> queryResult =
+        druidBroker.fireQuery(json, null, false);
     JSONArray jsonArray = queryResult.right().get().right().get();
 
     JSONObject columnsInfo = jsonArray.getJSONObject(0).getJSONObject("columns");
@@ -1163,26 +1163,24 @@ public class CheetahDatabaseMetaData implements DatabaseMetaData {
     if (dataSourceDescRes.isLeft())
       throw new SQLException(dataSourceDescRes.left().get());
 
-    TableSchema schema = new TableSchema();
-    schema.addColumn(new ColumnSchema("TABLE_NAME", java.sql.Types.VARCHAR));
-    schema.addColumn(new ColumnSchema("COLUMN_NAME", java.sql.Types.VARCHAR));
-    schema.addColumn(new ColumnSchema("DATA_TYPE", java.sql.Types.VARCHAR));
-    schema.addColumn(new ColumnSchema("TYPE_NAME", java.sql.Types.VARCHAR));
-
-    InMemTable memTable = new InMemTable(schema);
+    InMemTable memTable = new InMemTable(new TableSchema()
+        .addColumn("TABLE_NAME", java.sql.Types.VARCHAR)
+        .addColumn("COLUMN_NAME", java.sql.Types.VARCHAR)
+        .addColumn("DATA_TYPE", java.sql.Types.INTEGER)
+        .addColumn("TYPE_NAME", java.sql.Types.VARCHAR));
 
     List<String> dims = dataSourceDescRes.right().get()._1();
     Map<String, String> dimsType = retrieveColumnType(tableNamePattern, dims);
     for (String dim : dims) {
-      memTable.append(Tuple.of(tableNamePattern,
-              dim, toSqlType(dimsType.get(dim)), toSqlTypeName(dimsType.get(dim))));
+      String type = dimsType.get(dim);
+      memTable.append(Tuple.of(tableNamePattern, dim, toSqlType(type), toSqlTypeName(type)));
     }
 
     List<String> metrics = dataSourceDescRes.right().get()._2();
     Map<String, String> metricsType = retrieveColumnType(tableNamePattern, metrics);
     for (String metric : metrics) {
-      memTable.append(Tuple.of(tableNamePattern,
-              metric, toSqlType(metricsType.get(metric)), toSqlTypeName(metricsType.get(metric))));
+      String type = metricsType.get(metric);
+      memTable.append(Tuple.of(tableNamePattern, metric, toSqlType(type), toSqlTypeName(type)));
     }
 
     return new CheetahResultSet(memTable);

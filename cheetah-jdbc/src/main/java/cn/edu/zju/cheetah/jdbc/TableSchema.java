@@ -39,6 +39,10 @@ public class TableSchema {
     colMap.put(colDef.getColumnName(), columns.size() - 1);
     return this;
   }
+
+  public TableSchema addColumn(String colName, int colType) {
+    return addColumn(new ColumnSchema(colName, colType));
+  }
   
   public List<ColumnSchema> getColumns() {
     return this.columns;
