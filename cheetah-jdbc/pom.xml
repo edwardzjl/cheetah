@@ -36,5 +36,20 @@
 			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.calcite</groupId>
+			<artifactId>calcite-core</artifactId>
+			<version>${calcite.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.calcite</groupId>
+			<artifactId>calcite-avatica</artifactId>
+			<version>${calcite.avatica.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.calcite</groupId>
+			<artifactId>calcite-druid</artifactId>
+			<version>${calcite.druid.version}</version>
+		</dependency>
 	</dependencies>
 </project>
