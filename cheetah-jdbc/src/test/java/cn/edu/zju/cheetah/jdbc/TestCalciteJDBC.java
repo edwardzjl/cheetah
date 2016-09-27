@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -48,7 +47,7 @@ public class TestCalciteJDBC extends TestCase {
       }
     }
     
-    try (ResultSet rs = metaData.getColumns(null, null, "metrics", null)) {
+    try (ResultSet rs = metaData.getColumns(null, null, "wikiticker", null)) {
       while (rs.next()) {
         for (int i = 1; i <= 6; i++) {
           System.out.print(rs.getString(i) + " | ");
@@ -57,16 +56,16 @@ public class TestCalciteJDBC extends TestCase {
       }
     }
     
-    Statement stmt = calciteConnection.createStatement();
-    String sql = "SELECT * FROM \"wikiticker\" limit 20";
-    try (ResultSet rs = stmt.executeQuery(sql)) {
-      while (rs.next()) {
-        for (int i = 1; i <= 11; i++) {
-          System.out.print(rs.getString(i) + " | ");
-        }
-        System.out.println();
-      }
-    }
+//    Statement stmt = calciteConnection.createStatement();
+//    String sql = "SELECT * FROM \"wikiticker\" limit 20";
+//    try (ResultSet rs = stmt.executeQuery(sql)) {
+//      while (rs.next()) {
+//        for (int i = 1; i <= 11; i++) {
+//          System.out.print(rs.getString(i) + " | ");
+//        }
+//        System.out.println();
+//      }
+//    }
   }
 
 }
