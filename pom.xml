@@ -47,8 +47,8 @@
 		<derby.version>10.10.2.0</derby.version>
 		<guava.version>19.0</guava.version>
 		<sql4d.version>4.0.1</sql4d.version>
-		<calcite.version>1.8.0</calcite.version>
-		<calcite.druid.version>1.8.0</calcite.druid.version>
+		<calcite.version>1.9.0</calcite.version>
+		<calcite.druid.version>1.9.0</calcite.druid.version>
 		<calcite.avatica.version>1.6.0</calcite.avatica.version>
 	</properties>
 	<modules>
