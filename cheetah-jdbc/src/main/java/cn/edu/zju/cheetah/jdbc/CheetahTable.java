@@ -1,11 +1,4 @@
-/**
- * 
- */
 package cn.edu.zju.cheetah.jdbc;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.calcite.interpreter.BindableConvention;
 import org.apache.calcite.plan.RelOptCluster;
@@ -20,55 +13,67 @@ import org.apache.calcite.schema.Table;
 import org.apache.calcite.schema.TranslatableTable;
 import org.apache.calcite.schema.impl.AbstractTable;
 import org.apache.calcite.sql.type.SqlTypeName;
-import org.apache.calcite.util.Util;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
+import org.joda.time.chrono.ISOChronology;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * @author JIANG
- *
+ * Table mapped onto a Cheetah table.
  */
 public class CheetahTable extends AbstractTable implements TranslatableTable {
 
-  protected static final String DEFAULT_INTERVAL =
-      "1900-01-09T00:00:00.000Z/2992-01-10T00:00:00.000Z";
+  public static final String DEFAULT_TIMESTAMP_COLUMN = "__time";
+  public static final Interval DEFAULT_INTERVAL =
+      new Interval(new DateTime("1900-01-01", ISOChronology.getInstanceUTC()),
+          new DateTime("3000-01-01", ISOChronology.getInstanceUTC()));
+
   final CheetahSchema schema;
   final String dataSource;
   final RelProtoDataType protoRowType;
   final ImmutableSet<String> metricFieldNames;
-  final List<String> intervals;
+  final ImmutableList<Interval> intervals;
   final String timestampFieldName;
 
   /**
-   * Creates a Druid table.
+   * Creates a Cheetah table.
    *
-   * @param schema Druid schema that contains this table
-   * @param dataSource Druid data source name
+   * @param schema Cheetah schema that contains this table
+   * @param dataSource Cheetah data source name
    * @param protoRowType Field names and types
    * @param metricFieldNames Names of fields that are metrics
    * @param intervals Default interval if query does not constrain the time, or null
    * @param timestampFieldName Name of the column that contains the time
+   * @param intervals Intervals for the given table
    */
   public CheetahTable(CheetahSchema schema, String dataSource,
-      RelProtoDataType protoRowType, Set<String> metricFieldNames, List<String> intervals,
-      String timestampFieldName) {
+                      RelProtoDataType protoRowType, Set<String> metricFieldNames,
+                      String timestampFieldName, List<Interval> intervals) {
     this.timestampFieldName = Preconditions.checkNotNull(timestampFieldName);
     this.schema = Preconditions.checkNotNull(schema);
     this.dataSource = Preconditions.checkNotNull(dataSource);
     this.protoRowType = protoRowType;
     this.metricFieldNames = ImmutableSet.copyOf(metricFieldNames);
-    this.intervals = Preconditions.checkNotNull(
-        Util.first(intervals, ImmutableList.of(DEFAULT_INTERVAL)));
+    this.intervals = intervals != null ? ImmutableList.copyOf(intervals)
+        : ImmutableList.of(DEFAULT_INTERVAL);
+    for (Interval interval : this.intervals) {
+      assert interval.getChronology() == ISOChronology.getInstanceUTC();
+    }
   }
 
-  /** Creates a {@link DruidTable}
+  /** Creates a {@link CheetahTable}
    *
-   * @param druidSchema Druid schema
-   * @param dataSourceName Data source name in Druid, also table name
+   * @param cheetahSchema Cheetah schema
+   * @param dataSourceName Data source name in Cheetah, also table name
    * @param intervals Intervals, or null to use default
    * @param fieldMap Mutable map of fields (dimensions plus metrics);
    *        may be partially populated already
@@ -79,21 +84,18 @@ public class CheetahTable extends AbstractTable implements TranslatableTable {
    *                   definitions
    * @return A table
    */
-  static Table create(CheetahSchema druidSchema, String dataSourceName,
-      List<String> intervals, Map<String, SqlTypeName> fieldMap,
-      Set<String> metricNameSet, String timestampColumnName,
-      CheetahCalciteConnection connection) {
+  static Table create(CheetahSchema cheetahSchema, String dataSourceName,
+                      List<Interval> intervals, Map<String, SqlTypeName> fieldMap,
+                      Set<String> metricNameSet, String timestampColumnName,
+                      CheetahConnectionImpl connection) {
     if (connection != null) {
-      connection.metadata(dataSourceName, intervals, fieldMap, metricNameSet);
+      connection.metadata(dataSourceName, timestampColumnName, intervals, fieldMap, metricNameSet);
     }
     final ImmutableMap<String, SqlTypeName> fields =
         ImmutableMap.copyOf(fieldMap);
-    if (timestampColumnName == null) {
-      timestampColumnName = Iterables.get(fieldMap.keySet(), 0);
-    }
-    return new CheetahTable(druidSchema, dataSourceName,
+    return new CheetahTable(cheetahSchema, dataSourceName,
         new MapRelProtoDataType(fields), ImmutableSet.copyOf(metricNameSet),
-        intervals, Util.first(timestampColumnName, "__time"));
+        timestampColumnName, intervals);
   }
 
   public RelDataType getRowType(RelDataTypeFactory typeFactory) {
@@ -130,5 +132,6 @@ public class CheetahTable extends AbstractTable implements TranslatableTable {
       return builder.build();
     }
   }
-
 }
+
+// End CheetahTable.java
