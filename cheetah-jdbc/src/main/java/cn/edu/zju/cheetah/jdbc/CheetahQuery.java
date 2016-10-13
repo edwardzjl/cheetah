@@ -322,7 +322,7 @@ public class CheetahQuery extends AbstractRelNode implements BindableRel {
 
   @Override public RelOptCost computeSelfCost(RelOptPlanner planner,
       RelMetadataQuery mq) {
-    return Util.last(rels).computeSelfCost(planner, mq).multiplyBy(.1);
+    return planner.getCostFactory().makeZeroCost();
   }
 
   @Override public void register(RelOptPlanner planner) {
