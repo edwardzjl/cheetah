@@ -1,4 +1,4 @@
-package cn.edu.zju.cheetah.jdbc;
+package cn.edu.zju.cheetah.jdbc.adapter;
 
 import org.apache.calcite.interpreter.BindableConvention;
 import org.apache.calcite.plan.RelOptCluster;

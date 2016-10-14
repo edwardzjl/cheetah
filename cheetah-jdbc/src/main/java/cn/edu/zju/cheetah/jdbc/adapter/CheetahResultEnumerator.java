@@ -1,4 +1,4 @@
-package cn.edu.zju.cheetah.jdbc;
+package cn.edu.zju.cheetah.jdbc.adapter;
 
 public class CheetahResultEnumerator {
 }

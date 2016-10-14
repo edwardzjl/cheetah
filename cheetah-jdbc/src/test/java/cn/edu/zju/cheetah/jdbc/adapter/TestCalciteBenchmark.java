@@ -1,4 +1,4 @@
-package cn.edu.zju.cheetah.jdbc;
+package cn.edu.zju.cheetah.jdbc.adapter;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,18 +12,17 @@ import java.util.Properties;
 import org.apache.calcite.jdbc.CalciteConnection;
 import org.apache.calcite.schema.Schema;
 import org.apache.calcite.util.ConversionUtil;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class TestCalciteBenchmark extends TestCase {
+public class TestCalciteBenchmark {
 
   private static final String BROKER = "http://10.214.208.42:8082";
   private static final String COORDINATOR = "http://10.214.208.42:8081";
 
   private static final String[] SQLS_IMPLEMENTED = new String[]{
       // Case 1: select
-      "SELECT \"good_name\" "
-          + "FROM \"uniq_submit_order\"",
+      "SELECT \"channel\" "
+          + "FROM \"wikiticker\"",
 
       // Case 2: select with where
       "SELECT COUNT(*) "
@@ -151,22 +150,23 @@ public class TestCalciteBenchmark extends TestCase {
         timeAcc += query(sqls[i]);
       }
 
-      System.out.println("Time consumed: " + timeAcc/execCount + "ms");
+      System.out.println("Avg time consumed: " + timeAcc/execCount + "ms");
 
       System.out.println();
     }
   }
 
-  public void testCalciteJDBC() throws SQLException, ClassNotFoundException {
+  @Test
+  public void benchmark() throws SQLException, ClassNotFoundException {
     prepare();
 
     System.out.println("========== For implemented features ==========\n");
     run(SQLS_IMPLEMENTED);
     System.out.println();
 
-//    System.out.println("========== For partial implemented features ==========\n");
-//    run(SQLS_PARTIAL_IMPLEMENTED);
-//    System.out.println();
+    System.out.println("========== For partial implemented features ==========\n");
+    run(SQLS_PARTIAL_IMPLEMENTED);
+    System.out.println();
   }
 
 }
