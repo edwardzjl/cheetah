@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import org.apache.calcite.jdbc.CalciteConnection;
 import org.apache.calcite.schema.Schema;
+import org.apache.calcite.util.ConversionUtil;
 
 import cn.edu.zju.cheetah.jdbc.adapter.CheetahSchemaFactory;
 
@@ -21,9 +22,17 @@ public class CheetahDriver implements Driver {
   static {
     try {
       DriverManager.registerDriver(new CheetahDriver());
+      initCharset();
     } catch (SQLException e) {
       throw new RuntimeException("Cannot load Cheetah driver");
     }
+  }
+
+  private static void initCharset() {
+    System.setProperty("saffron.default.charset", ConversionUtil.NATIVE_UTF16_CHARSET_NAME);
+    System.setProperty("saffron.default.nationalcharset", ConversionUtil.NATIVE_UTF16_CHARSET_NAME);
+    System.setProperty("saffron.default.collation.name",
+        ConversionUtil.NATIVE_UTF16_CHARSET_NAME + "$en_US");
   }
 
   @Override
