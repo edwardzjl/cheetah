@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -18,6 +19,8 @@ import org.apache.calcite.util.ConversionUtil;
 import cn.edu.zju.cheetah.jdbc.adapter.CheetahSchemaFactory;
 
 public class CheetahDriver implements Driver {
+  private static final org.apache.log4j.Logger LOG =
+      org.apache.log4j.Logger.getLogger(CheetahDriver.class);
 
   static {
     try {
@@ -37,9 +40,22 @@ public class CheetahDriver implements Driver {
 
   @Override
   public Connection connect(String url, Properties info) throws SQLException {
+    LOG.debug("Jdbc url: " + url);
+    LOG.debug("Jdbc props: " + info);
+
+    StringBuilder sb = new StringBuilder();
+    Enumeration<Driver> drivers = DriverManager.getDrivers();
+    while (drivers.hasMoreElements()) {
+      sb.append(drivers.nextElement().getClass().getName());
+      sb.append(", ");
+    }
+    LOG.debug("Installed jdbc drivers: " + sb.toString());
+
     Map<String, Object> operand = convertProps(url, info);
 
     Connection connection = DriverManager.getConnection("jdbc:calcite:", new Properties());
+    LOG.debug("Connection " + connection + " from " + url);
+
     CalciteConnection calciteConnection = connection.unwrap(CalciteConnection.class);
 
     CheetahSchemaFactory schemaFactory = new CheetahSchemaFactory();
