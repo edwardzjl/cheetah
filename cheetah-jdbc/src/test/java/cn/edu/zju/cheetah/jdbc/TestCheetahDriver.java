@@ -40,13 +40,13 @@ public class TestCheetahDriver extends TestCase {
     DatabaseMetaData metaData = dbConn.getMetaData();
     assertNotNull(metaData);
 
-    try (ResultSet rs = metaData.getColumns(null, null, "wikiticker", "cityName")) {
+    try (ResultSet rs = metaData.getColumns(null, null, "wikiticker", null)) {
       System.out.println("getColumns: ");
       printResultSet(rs);
       rs.close();
     }
 
-    try (ResultSet rs = metaData.getTables(null, null, "wikiticker", null)) {
+    try (ResultSet rs = metaData.getTables(null, "default", null, null)) {
       System.out.println("getTables: ");
       printResultSet(rs);
       rs.close();
