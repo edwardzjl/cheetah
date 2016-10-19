@@ -40,9 +40,11 @@ public class CheetahTable extends AbstractTable implements TranslatableTable {
   final CheetahSchema schema;
   final String dataSource;
   final RelProtoDataType protoRowType;
-  final ImmutableSet<String> metricFieldNames;
+  // edwardlol: change access modifiers from package-private to public
+  public final ImmutableSet<String> metricFieldNames;
   final ImmutableList<Interval> intervals;
-  final String timestampFieldName;
+  // edwardlol: change access modifiers from package-private to public
+  public final String timestampFieldName;
 
   /**
    * Creates a Cheetah table.

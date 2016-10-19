@@ -16,6 +16,7 @@
  */
 package cn.edu.zju.cheetah.jdbc.adapter;
 
+import cn.edu.zju.cheetah.jdbc.adapter.rules.CheetahRules;
 import org.apache.calcite.DataContext;
 import org.apache.calcite.avatica.ColumnMetaData;
 import org.apache.calcite.config.CalciteConnectionProperty;
@@ -29,7 +30,6 @@ import org.apache.calcite.linq4j.Ord;
 import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.plan.RelOptCost;
 import org.apache.calcite.plan.RelOptPlanner;
-import org.apache.calcite.plan.RelOptRule;
 import org.apache.calcite.plan.RelOptTable;
 import org.apache.calcite.plan.RelTraitSet;
 import org.apache.calcite.rel.AbstractRelNode;
@@ -86,9 +86,11 @@ public class CheetahQuery extends AbstractRelNode implements BindableRel {
   protected QuerySpec querySpec;
 
   final RelOptTable table;
-  final CheetahTable cheetahTable;
+  // edwardlol: change access modifiers from package-private to public
+  public final CheetahTable cheetahTable;
   final ImmutableList<Interval> intervals;
-  final ImmutableList<RelNode> rels;
+  // edwardlol: change access modifiers from package-private to public
+  public final ImmutableList<RelNode> rels;
 
   private static final Pattern VALID_SIG = Pattern.compile("sf?p?a?l?");
   protected static final String CHEETAH_QUERY_FETCH = "druid.query.fetch";
@@ -125,7 +127,8 @@ public class CheetahQuery extends AbstractRelNode implements BindableRel {
    *
    * @see #isValidSignature(String)
    */
-  String signature() {
+  // edwardlol: change access modifiers from package-private to public
+  public String signature() {
     final StringBuilder b = new StringBuilder();
     for (RelNode rel : rels) {
       b.append(rel instanceof TableScan ? 's'
@@ -197,7 +200,8 @@ public class CheetahQuery extends AbstractRelNode implements BindableRel {
     return true;
   }
 
-  boolean isValidFilter(RexNode e) {
+  // edwardlol: change access modifiers from package-private to public
+  public boolean isValidFilter(RexNode e) {
     switch (e.getKind()) {
     case INPUT_REF:
     case LITERAL:
@@ -231,7 +235,8 @@ public class CheetahQuery extends AbstractRelNode implements BindableRel {
 
   /** Returns whether a signature represents an sequence of relational operators
    * that can be translated into a valid Cheetah query. */
-  static boolean isValidSignature(String signature) {
+  // edwardlol: change access modifiers from package-private to public
+  public static boolean isValidSignature(String signature) {
     return VALID_SIG.matcher(signature).matches();
   }
 
