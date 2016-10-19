@@ -57,9 +57,9 @@ public class CheetahDateTimeUtils {
       return null;
     }
     final TreeRangeSet condensedRanges = TreeRangeSet.create();
-    for (Range r : ranges) {
-      condensedRanges.add(r);
-    }
+    // edwardlol: replace for-loop with foreach call
+    ranges.forEach(condensedRanges::add);
+
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Inferred ranges on interval : " + condensedRanges);
     }

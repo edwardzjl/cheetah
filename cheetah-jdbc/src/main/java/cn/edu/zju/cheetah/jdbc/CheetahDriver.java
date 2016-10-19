@@ -93,11 +93,14 @@ public class CheetahDriver implements Driver {
         if (parameters.containsKey(propertyName)){
           props.put(propertyName, parameters.get(propertyName));
         }
-    } else {
-      for (String propertyName : CheetahCluster.PROPERTY_NAMES)
-        if (connProps.containsKey(propertyName)){
-          props.put(propertyName, connProps.get(propertyName));
-        }
+    }
+    // edwardlol:
+    // whether there are some props defined in url or not,
+    // always check the connProps
+    for (String propertyName : CheetahCluster.PROPERTY_NAMES) {
+      if (connProps.containsKey(propertyName)){
+        props.put(propertyName, connProps.get(propertyName));
+      }
     }
 
     Map<String, Object> operand = new HashMap<>();

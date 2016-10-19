@@ -326,12 +326,9 @@ public class CheetahQuery extends AbstractRelNode implements BindableRel {
   }
 
   @Override public void register(RelOptPlanner planner) {
-    for (RelOptRule rule : CheetahRules.RULES) {
-      planner.addRule(rule);
-    }
-    for (RelOptRule rule : Bindables.RULES) {
-      planner.addRule(rule);
-    }
+    // edwardlol: replace for-loops with foreach calls
+    CheetahRules.RULES.forEach(planner::addRule);
+    Bindables.RULES.forEach(planner::addRule);
   }
 
   @Override public Class<Object[]> getElementType() {

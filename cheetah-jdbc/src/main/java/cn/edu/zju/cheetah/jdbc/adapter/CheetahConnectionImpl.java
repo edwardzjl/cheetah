@@ -340,6 +340,7 @@ class CheetahConnectionImpl implements CheetahConnection {
     }
   }
 
+  @SuppressWarnings("unused")
   private void expectObjectField(JsonParser parser, String name)
       throws IOException {
     expect(parser, JsonToken.FIELD_NAME);
@@ -348,9 +349,10 @@ class CheetahConnectionImpl implements CheetahConnection {
           + parser.getCurrentName());
     }
     expect(parser, JsonToken.START_OBJECT);
-    while (parser.nextToken() != JsonToken.END_OBJECT) {
-        // empty
-    }
+    // edwardlol: delete empty while-loop
+//    while (parser.nextToken() != JsonToken.END_OBJECT) {
+//        // empty
+//    }
   }
 
   private Long extractTimestampField(JsonParser parser)
@@ -370,6 +372,12 @@ class CheetahConnectionImpl implements CheetahConnection {
       return parse.getTime();
     } catch (ParseException e) {
       // ignore bad value
+      // edwardlol: add debug info, may change to log4j later
+      if (CalcitePrepareImpl.DEBUG) {
+        System.out.println("expected timestamp format: \"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\", " +
+                "got: " + parser.getText());
+        e.printStackTrace();
+      }
     }
     return null;
   }
@@ -427,11 +435,13 @@ class CheetahConnectionImpl implements CheetahConnection {
     final String url = this.url + "/druid/v2/?pretty";
     final Map<String, String> requestHeaders =
         ImmutableMap.of("Content-Type", "application/json");
-    final String data = CheetahQuery.metadataQuery(dataSourceName, intervals);
+    // edwardlol: change the variable name from 'data' to 'jsonQuery'
+    final String jsonQuery = CheetahQuery.metadataQuery(dataSourceName, intervals);
     if (CalcitePrepareImpl.DEBUG) {
-      System.out.println("Cheetah: " + data);
+      // edwardlol: also change debug output
+      System.out.println("metadata JSON query: " + jsonQuery);
     }
-    try (InputStream in0 = post(url, data, requestHeaders, 10000, 1800000);
+    try (InputStream in0 = post(url, jsonQuery, requestHeaders, 10000, 1800000);
          InputStream in = traceResponse(in0)) {
       final ObjectMapper mapper = new ObjectMapper()
           .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

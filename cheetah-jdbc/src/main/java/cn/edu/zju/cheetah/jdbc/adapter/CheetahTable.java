@@ -58,7 +58,8 @@ public class CheetahTable extends AbstractTable implements TranslatableTable {
   public CheetahTable(CheetahSchema schema, String dataSource,
                       RelProtoDataType protoRowType, Set<String> metricFieldNames,
                       String timestampFieldName, List<Interval> intervals) {
-    this.timestampFieldName = Preconditions.checkNotNull(timestampFieldName);
+    // edwardlol: change the check null strategy, make use of DEFAULT_TIMESTAMP_COLUMN
+    this.timestampFieldName = timestampFieldName == null ? DEFAULT_TIMESTAMP_COLUMN : timestampFieldName;
     this.schema = Preconditions.checkNotNull(schema);
     this.dataSource = Preconditions.checkNotNull(dataSource);
     this.protoRowType = protoRowType;
