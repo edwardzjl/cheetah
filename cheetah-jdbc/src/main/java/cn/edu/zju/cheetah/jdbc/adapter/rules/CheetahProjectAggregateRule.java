@@ -3,7 +3,6 @@ package cn.edu.zju.cheetah.jdbc.adapter.rules;
 import cn.edu.zju.cheetah.jdbc.adapter.CheetahDateTimeUtils;
 import cn.edu.zju.cheetah.jdbc.adapter.CheetahQuery;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import org.apache.calcite.plan.RelOptRule;
 import org.apache.calcite.plan.RelOptRuleCall;
 import org.apache.calcite.rel.RelNode;
@@ -22,8 +21,18 @@ import java.util.List;
  * Rule to push an {@link org.apache.calcite.rel.core.Aggregate} and
  * {@link org.apache.calcite.rel.core.Project} into a {@link CheetahQuery}.
  */
-public class CheetahProjectAggregateRule extends RelOptRule {
-    CheetahProjectAggregateRule() {
+class CheetahProjectAggregateRule extends RelOptRule {
+
+    private static final CheetahProjectAggregateRule instance;
+    static {
+        instance = new CheetahProjectAggregateRule();
+    }
+
+    static CheetahProjectAggregateRule getInstance() {
+        return instance;
+    }
+
+    private CheetahProjectAggregateRule() {
         super(operand(Aggregate.class, operand(Project.class, operand(CheetahQuery.class, none()))));
     }
 
@@ -40,7 +49,9 @@ public class CheetahProjectAggregateRule extends RelOptRule {
         }
         if (aggregate.indicator
                 || aggregate.getGroupSets().size() != 1
-                || Iterables.any(aggregate.getAggCallList(), CheetahRules.BAD_AGG)
+//                || Iterables.any(aggregate.getAggCallList(), CheetahRules.BAD_AGG)
+                // edwardlol: change
+                || aggregate.getAggCallList().stream().anyMatch(CheetahRules.BAD_AGG)
                 || !validAggregate(aggregate, timestampIdx)) {
             return;
         }

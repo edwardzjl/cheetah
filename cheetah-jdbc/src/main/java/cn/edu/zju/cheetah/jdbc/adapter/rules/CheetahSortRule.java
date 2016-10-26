@@ -16,8 +16,18 @@ import org.apache.calcite.util.Util;
 /**
  * Rule to push an {@link org.apache.calcite.rel.core.Aggregate} into a {@link CheetahQuery}.
  */
-public class CheetahSortRule extends RelOptRule {
-    CheetahSortRule() {
+class CheetahSortRule extends RelOptRule {
+
+    private static final CheetahSortRule instance;
+    static {
+        instance = new CheetahSortRule();
+    }
+
+    static CheetahSortRule getInstance() {
+        return instance;
+    }
+
+    private CheetahSortRule() {
         super(operand(Sort.class, operand(CheetahQuery.class, none())));
     }
 

@@ -23,8 +23,18 @@ import java.util.List;
 /**
  * Rule to push a {@link org.apache.calcite.rel.core.Project} into a {@link CheetahQuery}.
  */
-public class CheetahProjectRule extends RelOptRule {
-    CheetahProjectRule() {
+class CheetahProjectRule extends RelOptRule {
+
+    private static final CheetahProjectRule instance;
+    static {
+        instance = new CheetahProjectRule();
+    }
+
+    static CheetahProjectRule getInstance() {
+        return instance;
+    }
+
+    private CheetahProjectRule() {
         super(operand(Project.class, operand(CheetahQuery.class, none())));
     }
 

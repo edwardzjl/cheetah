@@ -2,7 +2,6 @@ package cn.edu.zju.cheetah.jdbc.adapter.rules;
 
 import cn.edu.zju.cheetah.jdbc.adapter.CheetahQuery;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import org.apache.calcite.plan.RelOptRule;
 import org.apache.calcite.plan.RelOptRuleCall;
 import org.apache.calcite.rel.RelNode;
@@ -14,8 +13,18 @@ import org.apache.calcite.util.Util;
 /**
  * Rule to push an {@link org.apache.calcite.rel.core.Aggregate} into a {@link CheetahQuery}.
  */
-public class CheetahAggregateRule extends RelOptRule {
-    CheetahAggregateRule() {
+class CheetahAggregateRule extends RelOptRule {
+
+    private static final CheetahAggregateRule instance;
+    static {
+        instance = new CheetahAggregateRule();
+    }
+
+    static CheetahAggregateRule getInstance() {
+        return instance;
+    }
+
+    private CheetahAggregateRule() {
         super(operand(Aggregate.class, operand(CheetahQuery.class, none())));
     }
 
@@ -27,7 +36,9 @@ public class CheetahAggregateRule extends RelOptRule {
         }
         if (aggregate.indicator
                 || aggregate.getGroupSets().size() != 1
-                || Iterables.any(aggregate.getAggCallList(), CheetahRules.BAD_AGG)
+//                || Iterables.any(aggregate.getAggCallList(), CheetahRules.BAD_AGG)
+                // edwardlol: change
+                || aggregate.getAggCallList().stream().anyMatch(CheetahRules.BAD_AGG)
                 || !validAggregate(aggregate, query)) {
             return;
         }

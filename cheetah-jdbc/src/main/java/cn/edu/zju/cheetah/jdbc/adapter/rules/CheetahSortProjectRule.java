@@ -10,8 +10,18 @@ import org.apache.calcite.rel.rules.ProjectSortTransposeRule;
  * {@link org.apache.calcite.rel.core.Sort}. Useful if after pushing Sort,
  * we could not push it inside CheetahQuery.
  */
-public class CheetahSortProjectRule extends ProjectSortTransposeRule {
-    CheetahSortProjectRule() {
+class CheetahSortProjectRule extends ProjectSortTransposeRule {
+
+    private static final CheetahSortProjectRule instance;
+    static {
+        instance = new CheetahSortProjectRule();
+    }
+
+    static CheetahSortProjectRule getInstance() {
+        return instance;
+    }
+
+    private CheetahSortProjectRule() {
         super(operand(Project.class, operand(Sort.class, operand(CheetahQuery.class, none()))));
     }
 }

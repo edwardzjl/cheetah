@@ -10,8 +10,18 @@ import org.apache.calcite.rel.rules.SortProjectTransposeRule;
  * {@link org.apache.calcite.rel.core.Project}. Useful to transform
  * to complex Cheetah queries.
  */
-public class CheetahProjectSortRule extends SortProjectTransposeRule {
-    CheetahProjectSortRule() {
+class CheetahProjectSortRule extends SortProjectTransposeRule {
+
+    private static final CheetahProjectSortRule instance;
+    static {
+        instance = new CheetahProjectSortRule();
+    }
+
+    static CheetahProjectSortRule getInstance() {
+        return instance;
+    }
+
+    private CheetahProjectSortRule() {
         super(operand(Sort.class, operand(Project.class, operand(CheetahQuery.class, none()))));
     }
 }

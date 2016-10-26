@@ -20,8 +20,18 @@ import java.util.List;
 /**
  * Rule to push a {@link org.apache.calcite.rel.core.Filter} into a {@link CheetahQuery}.
  */
-public class CheetahFilterRule extends RelOptRule {
-    CheetahFilterRule() {
+class CheetahFilterRule extends RelOptRule {
+
+    private static final CheetahFilterRule instance;
+    static {
+        instance = new CheetahFilterRule();
+    }
+
+    static CheetahFilterRule getInstance() {
+        return instance;
+    }
+
+    private CheetahFilterRule() {
         super(operand(Filter.class, operand(CheetahQuery.class, none())));
     }
 
