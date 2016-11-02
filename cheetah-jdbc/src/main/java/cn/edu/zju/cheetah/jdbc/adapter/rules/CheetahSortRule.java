@@ -71,10 +71,8 @@ class CheetahSortRule extends RelOptRule {
             }
             boolean refsTimestamp =
                     CheetahRules.checkTimestampRefOnQuery(positionsReferenced.build(), topAgg.getInput(), query);
-            if (refsTimestamp && metricsRefs != 0) {
-                return false;
-            }
-            return true;
+            // edwardlol: simplify if statement
+            return !(refsTimestamp && metricsRefs != 0);
         }
         // If it is going to be a Cheetah select operator, we push the limit if
         // it does not contain a sort specification (required by Cheetah)
