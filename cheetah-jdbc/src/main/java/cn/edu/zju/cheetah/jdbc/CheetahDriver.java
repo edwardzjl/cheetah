@@ -2,6 +2,7 @@ package cn.edu.zju.cheetah.jdbc;
 
 
 import cn.edu.zju.cheetah.jdbc.adapter.CheetahSchemaFactory;
+import org.apache.calcite.avatica.BuiltInConnectionProperty;
 import org.apache.calcite.avatica.ConnectionProperty;
 import org.apache.calcite.jdbc.CalciteConnection;
 import org.apache.calcite.schema.Schema;
@@ -182,8 +183,6 @@ public class CheetahDriver implements Driver {
      */
     @Override
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) throws SQLException {
-        // TODO: 17-3-14 finish this
-//        throw new SQLException();
 
         List<DriverPropertyInfo> list = new ArrayList<>();
 
@@ -191,14 +190,24 @@ public class CheetahDriver implements Driver {
         for (Map.Entry<Object, Object> entry : info.entrySet()) {
             list.add(new DriverPropertyInfo((String) entry.getKey(), (String) entry.getValue()));
         }
+
         // Next, add property definitions not mentioned in info
-//        for (ConnectionProperty p : getConnectionProperties()) {
-//            if (info.containsKey(p.name())) {
-//                continue;
-//            }
-//            list.add(new DriverPropertyInfo(p.name(), null));
-//        }
+        for (ConnectionProperty p : getConnectionProperties()) {
+            if (info.containsKey(p.name())) {
+                // if a property is both defined in url and info
+                // use the one in info
+                continue;
+            }
+            list.add(new DriverPropertyInfo(p.name(), null));
+        }
         return list.toArray(new DriverPropertyInfo[list.size()]);
+    }
+
+    /**
+     * Returns the connection properties supported by this driver.
+     */
+    protected Collection<ConnectionProperty> getConnectionProperties() {
+        return Arrays.asList(CheetahConnectionProperty.values());
     }
 
     @Override
