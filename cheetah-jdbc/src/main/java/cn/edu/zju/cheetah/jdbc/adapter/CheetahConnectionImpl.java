@@ -439,6 +439,12 @@ class CheetahConnectionImpl implements CheetahConnection {
 
     /**
      * Reads segment metadata, and populates a list of columns and metrics.
+     *
+     * @param dataSourceName      the name of the data source, aka, the "table"
+     * @param timestampColumnName the name of the timestamp column
+     * @param intervals           the intervals of the query
+     * @param fieldBuilder        used to store the columns
+     * @param metricNameBuilder   used to store the metrics
      */
     void metadata(String dataSourceName, String timestampColumnName, List<Interval> intervals,
                   Map<String, SqlTypeName> fieldBuilder, Set<String> metricNameBuilder) {

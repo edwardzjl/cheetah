@@ -192,12 +192,12 @@ public class CheetahDriver implements Driver {
             list.add(new DriverPropertyInfo((String) entry.getKey(), (String) entry.getValue()));
         }
         // Next, add property definitions not mentioned in info
-        for (ConnectionProperty p : getConnectionProperties()) {
-            if (info.containsKey(p.name())) {
-                continue;
-            }
-            list.add(new DriverPropertyInfo(p.name(), null));
-        }
+//        for (ConnectionProperty p : getConnectionProperties()) {
+//            if (info.containsKey(p.name())) {
+//                continue;
+//            }
+//            list.add(new DriverPropertyInfo(p.name(), null));
+//        }
         return list.toArray(new DriverPropertyInfo[list.size()]);
     }
 
