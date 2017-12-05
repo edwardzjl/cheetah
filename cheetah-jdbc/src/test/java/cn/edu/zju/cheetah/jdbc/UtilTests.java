@@ -4,6 +4,8 @@ import com.google.common.base.Function;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 import org.junit.Test;
 
@@ -72,5 +74,15 @@ public class UtilTests {
         // put the content into cache
         cahceBuilder.put("harry", "ssdded");
         System.out.println("harry value:" + cahceBuilder.get("harry"));
+    }
+
+    @Test
+    public void biMapTest() {
+        BiMap<String, String> upperToLower = HashBiMap.create();
+        upperToLower.put("A", "a");
+        upperToLower.put("B", "b");
+        upperToLower.put("C", "c");
+
+        System.out.println(upperToLower.get("A"));
     }
 }

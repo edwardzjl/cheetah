@@ -3,7 +3,6 @@ package cn.edu.zju.cheetah.jdbc;
 
 import org.apache.calcite.avatica.ConnectionConfigImpl;
 import org.apache.calcite.avatica.ConnectionProperty;
-import org.apache.calcite.avatica.remote.AvaticaHttpClientFactoryImpl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,13 +54,21 @@ public enum CheetahConnectionProperty implements ConnectionProperty {
 
     private final boolean required;
 
+    private final Class valueClass;
+
     //~ Constructors -----------------------------------------------------------
 
     CheetahConnectionProperty(String camelName, Type type, Object defaultValue, boolean required) {
+        this(camelName, type, defaultValue, required, null);
+    }
+
+
+    CheetahConnectionProperty(String camelName, Type type, Object defaultValue, boolean required, Class valueClass) {
         this.camelName = camelName;
         this.type = type;
         this.defaultValue = defaultValue;
         this.required = required;
+        this.valueClass = type.deduceValueClass(defaultValue, valueClass);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -89,5 +96,10 @@ public enum CheetahConnectionProperty implements ConnectionProperty {
     @Override
     public boolean required() {
         return this.required;
+    }
+
+    @Override
+    public Class valueClass() {
+        return this.valueClass;
     }
 }

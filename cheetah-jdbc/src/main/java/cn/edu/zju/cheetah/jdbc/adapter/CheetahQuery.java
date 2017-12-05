@@ -114,7 +114,7 @@ public class CheetahQuery extends AbstractRelNode implements BindableRel {
     this.intervals = ImmutableList.copyOf(intervals);
     this.rels = ImmutableList.copyOf(rels);
 
-    assert isValid(Litmus.THROW);
+    assert isValid(Litmus.THROW, null);
   }
 
   /** Returns a string describing the operations inside this query.
@@ -141,8 +141,9 @@ public class CheetahQuery extends AbstractRelNode implements BindableRel {
     return b.toString();
   }
 
-  @Override public boolean isValid(Litmus litmus) {
-    if (!super.isValid(litmus)) {
+  @Override
+  public boolean isValid(Litmus litmus, Context context) {
+    if (!super.isValid(litmus, context)) {
       return false;
     }
     final String signature = signature();
